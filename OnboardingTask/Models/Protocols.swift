@@ -7,12 +7,12 @@
 
 import Foundation
 
-protocol CardViewDelegate {
+protocol CardViewDelegate: AnyObject {
     func swipeDidEnd(on view: CardView)
     func deleteFromArray() 
 }
 
-protocol CardViewDataSource {
+protocol CardViewDataSource: AnyObject {
     func numberOfCardsToShow() -> Int
     func card(at index: Int) -> CardView
 }

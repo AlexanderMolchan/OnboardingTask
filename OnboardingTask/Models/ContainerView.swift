@@ -65,7 +65,6 @@ final class ContainerView: UIView, CardViewDelegate {
     
     func swipeDidEnd(on view: CardView) {
         guard let dataSource else { return }
-        view.removeFromSuperview()
         if remainingcards > 0 {
             let newIndex = dataSource.numberOfCardsToShow() - remainingcards
             addCardView(cardView: dataSource.card(at: newIndex), atIndex: 2)

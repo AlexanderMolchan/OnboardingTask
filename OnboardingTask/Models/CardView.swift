@@ -42,8 +42,8 @@ final class CardView: UIView {
     var cardViewImage: UIImage
     var cardViewText: String
     var cardViewCommentLabel: String
-    var delegate: CardViewDelegate?
-    var controllerDelegate: CardViewDelegate?
+    weak var delegate: CardViewDelegate?
+    weak var controllerDelegate: CardViewDelegate?
     
     init(cardViewImage: UIImage, cardViewText: String, cardViewCommentLabel: String) {
         self.cardViewImage = cardViewImage
@@ -58,9 +58,14 @@ final class CardView: UIView {
     }
     
     static func getData() -> [CardView] {
-        let firstCard = CardView(cardViewImage: UIImage(named: "image1") ?? UIImage(), cardViewText: "Ordina a domicilio senza limiti di distanza. Non èmagia, è Moovenda!", cardViewCommentLabel: "PRONTO?")
-        let secondCard = CardView(cardViewImage: UIImage(named: "image2") ?? UIImage(), cardViewText: "Ogni tanto inviamo degli sconti esclusivi tramite notifiche push, ci stai?", cardViewCommentLabel: "PROMOZIONI")
-        let thirdCard = CardView(cardViewImage: UIImage(named: "image3") ?? UIImage(), cardViewText: "Per sfruttare al massimo l'app, puoi condividerci la tua posizione?", cardViewCommentLabel: "POSIZIONE")
+        let image1 = UIImage(resource: .image1)
+        let image2 = UIImage(resource: .image2)
+        let image3 = UIImage(resource: .image3)
+
+        let firstCard = CardView(cardViewImage: image1, cardViewText: "Ordina a domicilio senza limiti di distanza. Non èmagia, è Moovenda!", cardViewCommentLabel: "PRONTO?")
+        let secondCard = CardView(cardViewImage: image2, cardViewText: "Ogni tanto inviamo degli sconti esclusivi tramite notifiche push, ci stai?", cardViewCommentLabel: "PROMOZIONI")
+        let thirdCard = CardView(cardViewImage: image3, cardViewText: "Per sfruttare al massimo l'app, puoi condividerci la tua posizione?", cardViewCommentLabel: "POSIZIONE")
+        
         return [firstCard, secondCard, thirdCard]
     }
     
@@ -138,23 +143,28 @@ final class CardView: UIView {
             case .ended:
                 if cardView.center.x > 300 {
                     delegate?.swipeDidEnd(on: cardView)
-                    controllerDelegate?.deleteFromArray()
+                    
                     UIView.animate(withDuration: 0.2) { [weak self] in
                         guard let self else { return }
                         cardView.center = CGPoint(x: centerOfParentContainer.x + point.x + 200, y: centerOfParentContainer.y + point.y + 75)
                         cardView.alpha = 0
                         self.layoutIfNeeded()
+                    } completion: { [weak self] isFinish in
+                        guard let self, isFinish else { return }
+                        self.controllerDelegate?.deleteFromArray()
                     }
                     return
                     
                 } else if cardView.center.x < 20 {
                     delegate?.swipeDidEnd(on: cardView)
-                    controllerDelegate?.deleteFromArray()
                     UIView.animate(withDuration: 0.2) { [weak self] in
                         guard let self else { return }
                         cardView.center = CGPoint(x: centerOfParentContainer.x + point.x - 200, y: centerOfParentContainer.y + point.y + 75)
                         cardView.alpha = 0
                         self.layoutIfNeeded()
+                    } completion: { [weak self] isFinish in
+                        guard let self, isFinish else { return }
+                        self.controllerDelegate?.deleteFromArray()
                     }
                     return
                 }
